@@ -20,6 +20,8 @@ class CategoriesList extends Component
 
     public array $activeCategories = [];
 
+    public int $editedCategoryId = 0;
+
     public function openModal(): void
     {
         $this->showModal = true;
@@ -52,6 +54,19 @@ class CategoriesList extends Component
         }
     }
 
+    public function editCategory(int $categoryId): void
+    {
+        $this->editedCategoryId = $categoryId;
+ 
+        $this->category = Category::find($categoryId);
+    }
+
+    public function cancelCategoryEdit(): void
+    {
+        $this->resetValidation();
+        $this->reset('editedCategoryId');
+    }
+
     protected function rules(): array 
     {
         return [
@@ -62,13 +77,15 @@ class CategoriesList extends Component
 
     public function save(): void
     {
-        $this->validate();
-
-        $this->category->position = Category::max('position') + 1; 
+        if ($this->editedCategoryId === 0) { 
+            $this->category->position = Category::max('position') + 1;
+        } 
  
         $this->category->save();
  
-        $this->reset('showModal');
+        $this->reset('showModal'); 
+        $this->resetValidation(); 
+        $this->reset('showModal', 'editedCategoryId');
     }
 
     public function render()
