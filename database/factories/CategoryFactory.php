@@ -20,6 +20,7 @@ class CategoryFactory extends Factory
             'name'      => $this->faker->words(rand(1, 2), true),
             'slug'      => $this->faker->unique()->slug(),
             'is_active' => $this->faker->boolean(90),
+            'position'  => 100,
         ];
     }
 }
