@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Livewire;
 
 use App\Models\Category;
@@ -21,6 +23,8 @@ class CategoriesList extends Component
     public array $activeCategories = [];
 
     public int $editedCategoryId = 0;
+
+    protected $listeners = ['delete'];
 
     public function openModal(): void
     {
@@ -65,6 +69,22 @@ class CategoriesList extends Component
     {
         $this->resetValidation();
         $this->reset('editedCategoryId');
+    }
+
+    public function deleteConfirm(string $method, ?int $id = null): void
+    {
+        $this->dispatchBrowserEvent('swal:confirm', [
+            'type'   => 'warning',
+            'title'  => __('Are you sure?'),
+            'text'   => '',
+            'id'     => $id,
+            'method' => $method,
+        ]);
+    }
+
+    public function delete(int $id): void
+    {
+        Category::findOrFail($id)->delete();
     }
 
     protected function rules(): array 

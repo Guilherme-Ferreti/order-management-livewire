@@ -1,5 +1,23 @@
 @push('scripts')
     <script src="https://unpkg.com/@nextapps-be/livewire-sortablejs@0.2.0/dist/livewire-sortable.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script> 
+    <script>
+        window.addEventListener('swal:confirm', event => {
+            swal.fire({
+                title: event.detail.title,
+                text: event.detail.text,
+                icon: event.detail.type,
+                showCancelButton: true,
+                confirmButtonColor: 'rgb(239 68 6)',
+                confirmButtonText: 'Yes, delete it!'
+            })
+                .then((willDelete) => {
+                    if (willDelete.isConfirmed) {
+                        window.livewire.emit(event.detail.method, event.detail.id);
+                    }
+                });
+        });
+    </script>
 @endpush
 
 <div>
@@ -90,7 +108,7 @@
                                             <x-primary-button wire:click="editCategory({{ $category->id }})">
                                                 Edit
                                             </x-primary-button>
-                                            <button class="px-4 py-2 text-xs text-red-500 uppercase bg-red-200 rounded-md border border-transparent hover:text-red-700 hover:bg-red-300">
+                                            <button wire:click="deleteConfirm('delete', {{ $category->id }})" class="px-4 py-2 text-xs text-red-500 uppercase bg-red-200 rounded-md border border-transparent hover:text-red-700 hover:bg-red-300">
                                                 Delete
                                             </button>
                                         @endif 
