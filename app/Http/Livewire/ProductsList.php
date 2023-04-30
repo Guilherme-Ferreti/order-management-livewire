@@ -4,13 +4,17 @@ declare(strict_types=1);
 
 namespace App\Http\Livewire;
 
+use App\Exports\ProductsExport;
 use App\Models\Category;
 use App\Models\Country;
 use App\Models\Product;
+use Illuminate\Http\Response;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\View\View;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ProductsList extends Component
 {
@@ -85,7 +89,14 @@ class ProductsList extends Component
         $products->each->delete();
  
         $this->reset('selected');
-    } 
+    }
+
+    public function export($format): BinaryFileResponse
+    {
+        abort_if(! in_array($format, ['csv', 'xlsx', 'pdf']), Response::HTTP_NOT_FOUND);
+ 
+        return Excel::download(new ProductsExport($this->selected), 'products.' . $format);
+    }
 
     public function mount(): void
     {
