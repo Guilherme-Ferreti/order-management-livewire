@@ -26,7 +26,12 @@ class DatabaseSeeder extends Seeder
             CountriesSeeder::class,
         ]);
 
-        Category::factory(10)->create();
-        Product::factory(10)->create();
+        $categories = Category::factory(10)->create();
+
+        Product::factory(100)
+            ->create()
+            ->each(fn (Product $product) => 
+                $product->categories()->attach($categories->random(rand(1, 3)))
+            );
     }
 }
