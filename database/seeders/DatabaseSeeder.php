@@ -1,11 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 use App\Models\Category;
-use App\Models\Country;
 use App\Models\Product;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -30,7 +31,7 @@ class DatabaseSeeder extends Seeder
 
         Product::factory(100)
             ->create()
-            ->each(fn (Product $product) => 
+            ->each(fn (Product $product) =>
                 $product->categories()->attach($categories->random(rand(1, 3)))
             );
     }

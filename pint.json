@@ -1,0 +1,22 @@
+{
+    "preset": "laravel",
+    "rules": {
+        "no_multiline_whitespace_around_double_arrow": false,
+        "binary_operator_spaces": false,
+        "blank_line_after_opening_tag": true,
+        "blank_line_after_namespace": true,
+        "concat_space": {
+            "spacing": "one"
+        },
+        "declare_parentheses": true,
+        "declare_strict_types": true,
+        "fully_qualified_strict_types": true,
+        "ordered_traits": true,
+        "protected_to_private": true,
+        "use_arrow_functions": true,
+        "new_with_braces": {
+            "anonymous_class": false,
+            "named_class": false
+        }
+    }
+}

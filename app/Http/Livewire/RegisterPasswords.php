@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Livewire;
 
 use App\Enums\PasswordStrengthLevel;
@@ -14,7 +16,7 @@ class RegisterPasswords extends Component
 
     public int $strengthScore = 0;
 
-    public array $strengthLevels = [ 
+    public array $strengthLevels = [
         1 => 'Weak',
         2 => 'Fair',
         3 => 'Good',
@@ -30,21 +32,21 @@ class RegisterPasswords extends Component
     {
         $lowercase = range('a', 'z');
         $uppercase = range('A', 'Z');
-        $digits = range(0,9);
+        $digits = range(0, 9);
         $special = ['!', '@', '#', '$', '%', '^', '*'];
         $chars = array_merge($lowercase, $uppercase, $digits, $special);
         $length = 12;
 
         do {
-            $password = array();
- 
+            $password = [];
+
             for ($i = 0; $i <= $length; $i++) {
                 $int = rand(0, count($chars) - 1);
                 $password[] = $chars[$int];
             }
- 
+
         } while (empty(array_intersect($special, $password)));
- 
+
         $this->setPasswords(implode('', $password));
     }
 
@@ -58,7 +60,7 @@ class RegisterPasswords extends Component
 
     public function updateStrengthScore(string $password): void
     {
-        $this->strengthScore = (new Zxcvbn())->passwordStrength($password)['score'];
+        $this->strengthScore = (new Zxcvbn)->passwordStrength($password)['score'];
     }
 
     public function getPasswordStrengthLabel(): string

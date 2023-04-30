@@ -30,7 +30,7 @@ class CategoriesList extends Component
     {
         $this->showModal = true;
 
-        $this->category = new Category();
+        $this->category = new Category;
     }
 
     public function updatedCategoryName(): void
@@ -53,7 +53,7 @@ class CategoriesList extends Component
             if ($category['position'] === $item['order']) {
                 continue;
             }
- 
+
             Category::where('id', $item['value'])->update(['position' => $item['order']]);
         }
     }
@@ -61,7 +61,7 @@ class CategoriesList extends Component
     public function editCategory(int $categoryId): void
     {
         $this->editedCategoryId = $categoryId;
- 
+
         $this->category = Category::find($categoryId);
     }
 
@@ -87,7 +87,7 @@ class CategoriesList extends Component
         Category::findOrFail($id)->delete();
     }
 
-    protected function rules(): array 
+    protected function rules(): array
     {
         return [
             'category.name' => ['required', 'string', 'min:3'],
@@ -97,14 +97,14 @@ class CategoriesList extends Component
 
     public function save(): void
     {
-        if ($this->editedCategoryId === 0) { 
+        if ($this->editedCategoryId === 0) {
             $this->category->position = Category::max('position') + 1;
-        } 
- 
+        }
+
         $this->category->save();
- 
-        $this->reset('showModal'); 
-        $this->resetValidation(); 
+
+        $this->reset('showModal');
+        $this->resetValidation();
         $this->reset('showModal', 'editedCategoryId');
     }
 
@@ -114,9 +114,9 @@ class CategoriesList extends Component
 
         $this->categories = collect($categories->items());
 
-        $this->activeCategories = $this->categories->mapWithKeys( 
-                fn (Category $category) => [$category->id => (bool) $category->is_active]
-            )->toArray();
+        $this->activeCategories = $this->categories->mapWithKeys(
+            fn (Category $category) => [$category->id => (bool) $category->is_active]
+        )->toArray();
 
         return view('livewire.categories-list', [
             'links' => $categories->links(),
