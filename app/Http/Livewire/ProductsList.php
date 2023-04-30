@@ -47,7 +47,7 @@ class ProductsList extends Component
         ],
     ];
 
-    protected $listeners = ['delete', 'deleteSelected']; 
+    protected $listeners = ['delete', 'deleteSelected'];
 
     public function sortByColumn(string $column): void
     {
@@ -59,7 +59,7 @@ class ProductsList extends Component
         }
     }
 
-    public function deleteConfirm(string $method, ?int $id = null): void 
+    public function deleteConfirm(string $method, ?int $id = null): void
     {
         $this->dispatchBrowserEvent('swal:confirm', [
             'type'   => 'warning',
@@ -69,32 +69,46 @@ class ProductsList extends Component
             'method' => $method,
         ]);
     }
- 
+
     public function delete(int $id): void
     {
         $product = Product::findOrFail($id);
- 
+
+        if ($product->orders()->exists()) {
+            $this->addError('orderexist', 'This product cannot be deleted, it already has orders');
+
+            return;
+        }
+
         $product->delete();
     }
 
-    public function getSelectedCountProperty(): int 
+    public function getSelectedCountProperty(): int
     {
         return count($this->selected);
-    } 
+    }
 
-    public function deleteSelected(): void 
+    public function deleteSelected(): void
     {
-        $products = Product::whereIn('id', $this->selected)->get();
- 
+        $products = Product::with('orders')->whereIn('id', $this->selected)->get();
+
+        foreach ($products as $product) {
+            if ($product->orders()->exists()) {
+                $this->addError('orderexist', "Product <span class='font-bold'>{$product->name}</span> cannot be deleted, it already has orders");
+
+                return;
+            }
+        }
+
         $products->each->delete();
- 
+
         $this->reset('selected');
     }
 
     public function export($format): BinaryFileResponse
     {
         abort_if(! in_array($format, ['csv', 'xlsx', 'pdf']), Response::HTTP_NOT_FOUND);
- 
+
         return Excel::download(new ProductsExport($this->selected), 'products.' . $format);
     }
 
