@@ -19,13 +19,36 @@ class ProductsList extends Component
 
     public array $countries = [];
 
+    public string $sortColumn = 'products.name'; 
+ 
+    public string $sortDirection = 'asc';
+
     public array $searchColumns = [ 
         'name'        => '',
         'price'       => ['', ''],
         'description' => '',
         'category_id' => 0,
         'country_id'  => 0,
-    ]; 
+    ];
+
+    protected $queryString = [
+        'sortColumn' => [
+            'except' => 'products.name'
+        ],
+        'sortDirection' => [
+            'except' => 'asc',
+        ],
+    ];
+
+    public function sortByColumn(string $column): void
+    {
+        if ($this->sortColumn === $column) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->reset('sortDirection');
+            $this->sortColumn = $column;
+        }
+    }
  
     public function mount(): void
     {
@@ -43,7 +66,9 @@ class ProductsList extends Component
     private function getProducts(): LengthAwarePaginator
     {
         $products = Product::query()
-            ->with('categories:id,name', 'country:id,name');
+            ->join('countries', 'countries.id', '=', 'products.country_id')
+            ->select(['products.*', 'countries.id as countryId', 'countries.name as countryName'])
+            ->with('categories:id,name');
  
         foreach ($this->searchColumns as $column => $value) {
             if (empty($value)) {
@@ -69,6 +94,8 @@ class ProductsList extends Component
                 $products->where('products.' . $column, 'LIKE', '%' . $value . '%')
             );
         }
+
+        $products->orderBy($this->sortColumn, $this->sortDirection);
 
         return $products->paginate(10);
     }
