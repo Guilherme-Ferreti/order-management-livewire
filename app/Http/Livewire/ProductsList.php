@@ -32,6 +32,8 @@ class ProductsList extends Component
         'country_id'  => 0,
     ];
 
+    public array $selected = [];
+
     protected $queryString = [
         'sortColumn' => [
             'except' => 'products.name',
@@ -40,6 +42,8 @@ class ProductsList extends Component
             'except' => 'asc',
         ],
     ];
+
+    protected $listeners = ['delete', 'deleteSelected']; 
 
     public function sortByColumn(string $column): void
     {
@@ -50,6 +54,38 @@ class ProductsList extends Component
             $this->sortColumn = $column;
         }
     }
+
+    public function deleteConfirm(string $method, ?int $id = null): void 
+    {
+        $this->dispatchBrowserEvent('swal:confirm', [
+            'type'   => 'warning',
+            'title'  => __('Are you sure?'),
+            'text'   => '',
+            'id'     => $id,
+            'method' => $method,
+        ]);
+    }
+ 
+    public function delete(int $id): void
+    {
+        $product = Product::findOrFail($id);
+ 
+        $product->delete();
+    }
+
+    public function getSelectedCountProperty(): int 
+    {
+        return count($this->selected);
+    } 
+
+    public function deleteSelected(): void 
+    {
+        $products = Product::whereIn('id', $this->selected)->get();
+ 
+        $products->each->delete();
+ 
+        $this->reset('selected');
+    } 
 
     public function mount(): void
     {
